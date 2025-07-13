@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "question": "What is the symbol for Hydrogen?",
+    "options": ["H", "He", "Li", "Be"],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": 2,
+    "question": "Which element is a noble gas?",
+    "options": ["Hydrogen", "Helium", "Lithium", "Beryllium"],
+    "correctAnswerIndex": 1
+  },
+  {
+    "id": 3,
+    "question": "What is the atomic number of Lithium?",
+    "options": ["1", "2", "3", "4"],
+    "correctAnswerIndex": 2
+  }
+]

@@ -8,16 +8,17 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.5
-  flutter_riverpod: ^2.0.0
+  get_it: ^7.6.0
+  flutter_riverpod: ^2.4.0
   http: ^0.13.5
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.2.0
   flutter_local_notifications: ^12.0.0
+  path: ^1.8.3
   sqflite: ^2.0.3
-  flutter_spinkit: ^5.1.0
+  flutter_spinkit: ^5.2.0
   url_launcher: ^6.1.7
-  charts_flutter: ^0.12.0
   flutter_secure_storage: ^7.0.0
-  get_it: ^7.2.0
+  connectivity_plus: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +29,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/elements.json
+    - assets/quiz_questions.json
+    - assets/learning_paths.json

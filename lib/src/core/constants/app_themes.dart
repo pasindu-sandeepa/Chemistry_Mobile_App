@@ -2,16 +2,41 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppThemes {
-  static final ThemeData lightTheme = ThemeData(
+  static final lightTheme = ThemeData(
     primaryColor: AppColors.primaryColor,
-    scaffoldBackgroundColor: AppColors.backgroundColor,
-    textTheme: const TextTheme(
-      titleLarge: TextStyle(color: AppColors.textColor, fontSize: 20),
-      bodyLarge: TextStyle(color: AppColors.textColor, fontSize: 16),
+    colorScheme: const ColorScheme.light(
+      primary: AppColors.primaryColor,
+      secondary: AppColors.secondaryColor,
     ),
+    scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primaryColor,
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+      foregroundColor: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.white,
+      ),
+    ),
+  );
+
+  static final darkTheme = ThemeData(
+    primaryColor: AppColors.primaryColor,
+    colorScheme: const ColorScheme.dark(
+      primary: AppColors.primaryColor,
+      secondary: AppColors.secondaryColor,
+    ),
+    scaffoldBackgroundColor: Colors.grey[900],
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.primaryColor,
+      foregroundColor: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.white,
+      ),
     ),
   );
 }
