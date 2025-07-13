@@ -1,0 +1,31 @@
+# Flutter/Dart specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Android specific
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# macOS specific
+.DS_Store
+
+# Editor specific
+.idea/
+*.iml
+.vscode/settings.json
+
+# Miscellaneous
+*.log
+*.lock
+*.swp
+*.swo
