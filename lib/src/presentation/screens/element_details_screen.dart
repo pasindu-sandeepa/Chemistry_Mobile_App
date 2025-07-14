@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/element_entity.dart';
-import '../../core/constants/app_colors.dart';
-import '../widgets/element_card.dart';
-import '../../domain/use_cases/save_favorite_element_use_case.dart';
 import '../../core/utils/dependency_injection.dart';
+import '../../domain/entities/element_entity.dart';
+import '../../domain/use_cases/save_favorite_element_use_case.dart';
+import '../widgets/custom_app_bar.dart';
+import '../providers/element_provider.dart';
 
 class ElementDetailsScreen extends ConsumerWidget {
   final ElementEntity element;
@@ -13,19 +13,38 @@ class ElementDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteElementsAsync = ref.watch(favoriteElementsProvider);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(element.name),
+      appBar: CustomAppBar(
+        title: element.name,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border),
-            onPressed: () {
-              final saveFavoriteUseCase = getIt<SaveFavoriteElementUseCase>();
-              saveFavoriteUseCase.execute(element);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${element.name} added to favorites')),
+          favoriteElementsAsync.when(
+            data: (favorites) {
+              final isFavorite = favorites.any(
+                (e) => e.atomicNumber == element.atomicNumber,
+              );
+              return IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  final saveFavoriteUseCase = getIt<SaveFavoriteElementUseCase>();
+                  await saveFavoriteUseCase.execute(element);
+                  ref.invalidate(favoriteElementsProvider);
+                },
               );
             },
+            loading: () => const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (e, _) => Icon(Icons.error, color: Colors.red),
           ),
         ],
       ),
@@ -34,20 +53,14 @@ class ElementDetailsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElementCard(element: element),
-            const SizedBox(height: 16),
-            Text(
-              'Atomic Number: ${element.atomicNumber}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            Text(
-              'Atomic Mass: ${element.atomicMass}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            Text(
-              'Category: ${element.category}',
-              style: const TextStyle(fontSize: 18),
-            ),
+            Text('Atomic Number: ${element.atomicNumber}',
+                style: const TextStyle(fontSize: 18)),
+            Text('Symbol: ${element.symbol}',
+                style: const TextStyle(fontSize: 18)),
+            Text('Atomic Mass: ${element.atomicMass}',
+                style: const TextStyle(fontSize: 18)),
+            Text('Category: ${element.category}',
+                style: const TextStyle(fontSize: 18)),
           ],
         ),
       ),

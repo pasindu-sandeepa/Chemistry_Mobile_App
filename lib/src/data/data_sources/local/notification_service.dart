@@ -1,67 +1,37 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import '../../core/constants/app_strings.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  NotificationService();
-
   Future<void> initialize() async {
-    const AndroidInitializationSettings androidInitializationSettings =
+    const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
     const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: androidInitializationSettings,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-    );
+        InitializationSettings(android: initializationSettingsAndroid);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> showQuizReminder() async {
-    const AndroidNotificationDetails androidNotificationDetails =
+  Future<void> scheduleSampleNotification() async {
+    await initialize();
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      'quiz_reminder_channel',
-      'Quiz Reminders',
-      channelDescription: 'Notifications for quiz reminders',
+      'periodic_table_channel',
+      'Periodic Table Notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
-
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-    );
-
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
     await _flutterLocalNotificationsPlugin.show(
       0,
-      AppStrings.quizReminderTitle,
-      AppStrings.quizReminderBody,
-      notificationDetails,
+      'Periodic Table Reminder',
+      'Keep learning about the elements!',
+      platformChannelSpecifics,
     );
   }
 
-  Future<void> showLearningPathReminder() async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'learning_path_reminder_channel',
-      'Learning Path Reminders',
-      channelDescription: 'Notifications for learning path progress',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-    );
-
-    await _flutterLocalNotificationsPlugin.show(
-      1,
-      AppStrings.learningPathReminderTitle,
-      AppStrings.learningPathReminderBody,
-      notificationDetails,
-    );
+  Future<void> cancelSampleNotification() async {
+    await _flutterLocalNotificationsPlugin.cancel(0);
   }
 }

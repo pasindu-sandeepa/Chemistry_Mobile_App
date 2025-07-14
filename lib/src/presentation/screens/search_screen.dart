@@ -2,67 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../domain/use_cases/search_elements_use_case.dart';
-import '../widgets/custom_app_bar.dart';
 import '../widgets/element_card.dart';
-import '../widgets/loading_indicator.dart';
+import '../widgets/custom_app_bar.dart';
+import 'element_details_screen.dart';
 
-final searchQueryProvider = StateProvider<String>((ref) => '');
-final searchResultsProvider = FutureProvider<List<dynamic>>((ref) async {
-  final query = ref.watch(searchQueryProvider);
-  final searchElementsUseCase = getIt<SearchElementsUseCase>();
-  return await searchElementsUseCase.execute(query);
-});
-
-class SearchScreen extends ConsumerWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchResultsAsync = ref.watch(searchResultsProvider);
-    final searchQuery = ref.watch(searchQueryProvider);
-    final searchQueryNotifier = ref.read(searchQueryProvider.notifier);
+  SearchScreenState createState() => SearchScreenState();
+}
 
+class SearchScreenState extends ConsumerState<SearchScreen> {
+  final TextEditingController _controller = TextEditingController();
+  List<dynamic> _searchResults = [];
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _search(String query) async {
+    final searchUseCase = getIt<SearchElementsUseCase>();
+    final results = await searchUseCase.execute(query);
+    setState(() {
+      _searchResults = results;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        titleKey: 'searchScreenTitle',
-      ),
+      appBar: const CustomAppBar(title: 'Search Elements'),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
-              onChanged: (value) {
-                searchQueryNotifier.state = value;
-              },
+              controller: _controller,
               decoration: const InputDecoration(
-                hintText: 'Search elements...',
+                labelText: 'Search by name, symbol, or category',
                 border: OutlineInputBorder(),
               ),
+              onChanged: _search,
             ),
           ),
           Expanded(
-            child: searchResultsAsync.when(
-              data: (elements) {
-                if (elements.isEmpty && searchQuery.isNotEmpty) {
-                  return const Center(child: Text('No elements found'));
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: elements.length,
-                  itemBuilder: (context, index) {
-                    final element = elements[index];
-                    return ElementCard(
-                      element: element,
-                      onTap: () {
-                        // Navigate to element detail screen (to be implemented)
-                      },
-                    );
-                  },
-                );
-              },
-              loading: () => const LoadingIndicator(),
-              error: (error, stack) => Center(child: Text('Error: $error')),
-            ),
+            child: _searchResults.isEmpty
+                ? const Center(child: Text('No results found'))
+                : ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final element = _searchResults[index];
+                      return ElementCard(
+                        element: element,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ElementDetailsScreen(element: element),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),

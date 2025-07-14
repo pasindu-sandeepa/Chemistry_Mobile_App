@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
-import '../../core/utils/dependency_injection.dart';
-import '../../data/data_sources/local/notification_service.dart';
 import '../widgets/custom_app_bar.dart';
 import 'element_list_screen.dart';
 import 'favorites_screen.dart';
@@ -14,19 +12,16 @@ import 'settings_screen.dart';
 import 'statistics_screen.dart';
 import 'about_screen.dart';
 import 'help_screen.dart';
-import 'offline_mode_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final notificationService = getIt<NotificationService>();
-
     return Scaffold(
       appBar: const CustomAppBar(
-        titleKey: AppStrings.homeScreenTitle,
-        showBackButton: false,
+        title: AppStrings.homeScreenTitle,
+        automaticallyImplyLeading: false, // No back button for Home
       ),
       body: Center(
         child: Column(
@@ -43,8 +38,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const ElementListScreen()),
+                  MaterialPageRoute(builder: (context) => const ElementListScreen()),
                 );
               },
               child: const Text('Explore Periodic Table'),
@@ -54,8 +48,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FavoritesScreen()),
+                  MaterialPageRoute(builder: (context) => const FavoritesScreen()),
                 );
               },
               child: const Text('View Favorites'),
@@ -72,8 +65,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () async {
-                await notificationService.showQuizReminder(context);
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const QuizScreen()),
@@ -83,12 +75,10 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () async {
-                await notificationService.showLearningPathReminder(context);
+              onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const LearningPathScreen()),
+                  MaterialPageRoute(builder: (context) => const LearningPathScreen()),
                 );
               },
               child: const Text('Learning Path'),
@@ -98,8 +88,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsScreen()),
+                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
                 );
               },
               child: const Text('Settings'),
@@ -109,11 +98,10 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const StatisticsScreen()),
+                  MaterialPageRoute(builder: (context) => const StatisticsScreen()),
                 );
               },
-              child: const Text('Statistics'),
+              child: const Text('View Statistics'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -134,17 +122,6 @@ class HomeScreen extends StatelessWidget {
                 );
               },
               child: const Text('Help'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const OfflineModeScreen()),
-                );
-              },
-              child: const Text('Offline Mode'),
             ),
           ],
         ),

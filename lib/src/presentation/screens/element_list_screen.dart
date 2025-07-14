@@ -1,36 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/utils/dependency_injection.dart';
-import '../../domain/use_cases/get_elements_use_case.dart';
-import '../widgets/custom_app_bar.dart';
 import '../widgets/element_card.dart';
-
-final elementsProvider = FutureProvider<List<dynamic>>((ref) async {
-  final getElementsUseCase = getIt<GetElementsUseCase>();
-  return await getElementsUseCase.execute();
-});
+import '../providers/element_provider.dart';
+import '../widgets/custom_app_bar.dart';
+import 'element_details_screen.dart';
 
 class ElementListScreen extends ConsumerWidget {
   const ElementListScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final elementsAsync = ref.watch(elementsProvider);
+    final elementsAsync = ref.watch(elementProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(
-        titleKey: 'elementListScreenTitle',
-      ),
+      appBar: const CustomAppBar(title: 'Periodic Table'),
       body: elementsAsync.when(
         data: (elements) {
           return GridView.builder(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
+              crossAxisCount: 4,
+              childAspectRatio: 1,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
             ),
             itemCount: elements.length,
             itemBuilder: (context, index) {
@@ -38,7 +30,12 @@ class ElementListScreen extends ConsumerWidget {
               return ElementCard(
                 element: element,
                 onTap: () {
-                  // Navigate to element detail screen (to be implemented)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ElementDetailsScreen(element: element),
+                    ),
+                  );
                 },
               );
             },

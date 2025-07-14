@@ -1,4 +1,5 @@
+import '../entities/statistics_entity.dart';
+
 abstract class StatisticsRepository {
-  Future<List<Map<String, dynamic>>> getQuizScores();
-  Future<int> getCompletedLearningPathsCount();
+  Future<StatisticsEntity> getUserStatistics();
 }

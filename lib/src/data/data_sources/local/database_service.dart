@@ -26,8 +26,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE quiz_scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            score INTEGER,
-            timestamp TEXT
+            score INTEGER
           )
         ''');
       },
@@ -60,23 +59,14 @@ class DatabaseService {
     final db = await database;
     await db.insert(
       'quiz_scores',
-      {
-        'score': score,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      {'score': score},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<List<Map<String, dynamic>>> getQuizScores() async {
+  Future<List<int>> getQuizScores() async {
     final db = await database;
-    return await db.query('quiz_scores', orderBy: 'timestamp DESC');
-  }
-
-  Future<int> getCompletedLearningPathsCount() async {
-    final db = await database;
-    final result = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM learning_paths WHERE isCompleted = 1');
-    return result.first['count'] as int;
+    final maps = await db.query('quiz_scores');
+    return maps.map((map) => map['score'] as int).toList();
   }
 }

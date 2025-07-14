@@ -1,60 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/data_sources/local/shared_preferences_service.dart';
+import '../../core/utils/dependency_injection.dart';
+import 'theme_provider.dart';
 
-final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
-  (ref) => SettingsNotifier(),
-);
-
+// Settings state
 class SettingsState {
-  final ThemeMode themeMode;
-  final String language;
+  final bool isDarkTheme;
+  SettingsState({required this.isDarkTheme});
 
-  SettingsState({required this.themeMode, required this.language});
-
-  SettingsState copyWith({ThemeMode? themeMode, String? language}) {
-    return SettingsState(
-      themeMode: themeMode ?? this.themeMode,
-      language: language ?? this.language,
-    );
-  }
+  SettingsState copyWith({bool? isDarkTheme}) =>
+      SettingsState(isDarkTheme: isDarkTheme ?? this.isDarkTheme);
 }
 
+// Notifier
 class SettingsNotifier extends StateNotifier<SettingsState> {
-  SettingsNotifier()
-      : super(SettingsState(themeMode: ThemeMode.system, language: 'en')) {
-    _loadSettings();
+  final SharedPreferencesService _sharedPreferencesService;
+  SettingsNotifier(this._sharedPreferencesService)
+      : super(SettingsState(isDarkTheme: false));
+
+  Future<void> loadTheme() async {
+    final theme = await _sharedPreferencesService.getTheme();
+    state = state.copyWith(isDarkTheme: theme == 'dark');
   }
 
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    final theme = prefs.getString('theme') ?? 'system';
-    final language = prefs.getString('language') ?? 'en';
-    state = SettingsState(
-      themeMode: theme == 'dark'
-          ? ThemeMode.dark
-          : theme == 'light'
-              ? ThemeMode.light
-              : ThemeMode.system,
-      language: language,
-    );
-  }
-
-  Future<void> setTheme(ThemeMode themeMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        'theme',
-        themeMode == ThemeMode.dark
-            ? 'dark'
-            : themeMode == ThemeMode.light
-                ? 'light'
-                : 'system');
-    state = state.copyWith(themeMode: themeMode);
-  }
-
-  Future<void> setLanguage(String language) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language', language);
-    state = state.copyWith(language: language);
+  Future<void> toggleTheme(bool isDarkTheme, WidgetRef ref) async {
+    await _sharedPreferencesService.setTheme(isDarkTheme ? 'dark' : 'light');
+    state = state.copyWith(isDarkTheme: isDarkTheme);
+    ref.read(themeModeProvider.notifier).state =
+        isDarkTheme ? ThemeMode.dark : ThemeMode.light;
   }
 }
+
+// Provider
+final settingsProvider =
+    StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
+  final prefs = getIt<SharedPreferencesService>();
+  final notifier = SettingsNotifier(prefs);
+  notifier.loadTheme();
+  return notifier;
+});

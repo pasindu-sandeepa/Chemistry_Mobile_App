@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'src/core/utils/dependency_injection.dart';
 import 'src/data/data_sources/local/notification_service.dart';
 import 'src/data/data_sources/local/shared_preferences_service.dart';
-import 'src/presentation/screens/home_screen.dart';
+import 'src/presentation/screens/splash_screen.dart'; // <-- Import SplashScreen
 import 'src/presentation/providers/theme_provider.dart';
 
 void main() async {
@@ -11,20 +11,20 @@ void main() async {
   await setupDependencies();
   final sharedPreferencesService = getIt<SharedPreferencesService>();
   final initialTheme = await sharedPreferencesService.getTheme();
-  
+
   final notificationService = getIt<NotificationService>();
   await notificationService.initialize();
 
   runApp(
     ProviderScope(
       overrides: [
-        themeModeProvider.overrideWithValue(
-          initialTheme == 'light'
+        themeModeProvider.overrideWith((ref) {
+          return initialTheme == 'light'
               ? ThemeMode.light
               : initialTheme == 'dark'
                   ? ThemeMode.dark
-                  : ThemeMode.system,
-        ),
+                  : ThemeMode.system;
+        }),
       ],
       child: const MyApp(),
     ),
@@ -49,7 +49,7 @@ class MyApp extends ConsumerWidget {
         brightness: Brightness.dark,
       ),
       themeMode: themeMode,
-      home: const HomeScreen(),
+      home: const SplashScreen(), // <-- Start with SplashScreen
     );
   }
 }

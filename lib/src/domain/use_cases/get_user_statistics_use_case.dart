@@ -1,3 +1,4 @@
+import '../entities/statistics_entity.dart';
 import '../repositories/statistics_repository.dart';
 
 class GetUserStatisticsUseCase {
@@ -5,12 +6,7 @@ class GetUserStatisticsUseCase {
 
   GetUserStatisticsUseCase(this.repository);
 
-  Future<Map<String, dynamic>> execute() async {
-    final quizScores = await repository.getQuizScores();
-    final completedPaths = await repository.getCompletedLearningPathsCount();
-    return {
-      'quizScores': quizScores,
-      'completedPaths': completedPaths,
-    };
+  Future<StatisticsEntity> execute() async {
+    return await repository.getUserStatistics();
   }
 }

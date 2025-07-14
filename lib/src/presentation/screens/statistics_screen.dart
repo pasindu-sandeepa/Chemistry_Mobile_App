@@ -1,38 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../domain/use_cases/get_user_statistics_use_case.dart';
 import '../widgets/custom_app_bar.dart';
-import '../widgets/loading_indicator.dart';
 
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final getUserStatisticsUseCase = getIt<GetUserStatisticsUseCase>();
+    final getStatisticsUseCase = getIt<GetUserStatisticsUseCase>();
 
     return Scaffold(
-      appBar: const CustomAppBar(
-        titleKey: 'statisticsScreenTitle',
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: getUserStatisticsUseCase.execute(),
-        builder: (context, snapshot) {
+      appBar: const CustomAppBar(title: 'Statistics'),
+      body: FutureBuilder(
+        future: getStatisticsUseCase.execute(),
+        builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingIndicator();
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData) {
             return const Center(child: Text('No statistics available'));
           }
-
           final stats = snapshot.data!;
-          final quizScores = stats['quizScores'] as List<Map<String, dynamic>>;
-          final completedPaths = stats['completedPaths'] as int;
-
-          return Padding(
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,28 +35,75 @@ class StatisticsScreen extends ConsumerWidget {
                   'Quiz Scores',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                quizScores.isEmpty
-                    ? const Text('No quiz scores recorded')
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: quizScores.length,
-                          itemBuilder: (context, index) {
-                            final score = quizScores[index];
-                            return ListTile(
-                              title: Text('Score: ${score['score']}'),
-                              subtitle: Text('Date: ${score['timestamp']}'),
-                            );
-                          },
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      barGroups: stats.quizScores.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final score = entry.value.toDouble();
+                        return BarChartGroupData(
+                          x: index,
+                          barRods: [
+                            BarChartRodData(
+                              toY: score,
+                              color: AppColors.primaryColor,
+                              width: 16,
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                      titlesData: FlTitlesData(
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) => Text('Quiz ${value.toInt() + 1}'),
+                          ),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: true),
                         ),
                       ),
-                const Divider(),
+                      borderData: FlBorderData(show: false),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
                 const Text(
-                  'Learning Paths',
+                  'Learning Path Completion',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                Text('Completed Learning Paths: $completedPaths'),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200,
+                  child: PieChart(
+                    PieChartData(
+                      sections: [
+                        PieChartSectionData(
+                          value: stats.learningPathCompletion.toDouble(),
+                          color: AppColors.primaryColor,
+                          title: '${stats.learningPathCompletion}',
+                          radius: 80,
+                        ),
+                        PieChartSectionData(
+                          value: (stats.totalLearningPaths - stats.learningPathCompletion).toDouble(),
+                          color: Colors.grey,
+                          title: '${stats.totalLearningPaths - stats.learningPathCompletion}',
+                          radius: 80,
+                        ),
+                      ],
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 40,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Completed: ${stats.learningPathCompletion}/${stats.totalLearningPaths}',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           );

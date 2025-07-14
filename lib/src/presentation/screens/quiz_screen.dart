@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/dependency_injection.dart';
 import '../providers/quiz_provider.dart';
-import '../widgets/custom_app_bar.dart';
 import '../widgets/quiz_question_card.dart';
-import '../widgets/loading_indicator.dart';
+import '../widgets/custom_app_bar.dart';
+import '../../data/data_sources/local/database_service.dart';
 
 class QuizScreen extends ConsumerWidget {
   const QuizScreen({Key? key}) : super(key: key);
@@ -14,10 +15,11 @@ class QuizScreen extends ConsumerWidget {
     final quizQuestionsAsync = ref.watch(quizProvider);
     final quizState = ref.watch(quizStateProvider);
     final quizStateNotifier = ref.read(quizStateProvider.notifier);
+    final databaseService = getIt<DatabaseService>();
 
     return Scaffold(
       appBar: CustomAppBar(
-        titleKey: 'quizScreenTitle',
+        title: 'Periodic Table Quiz',
         actions: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -36,17 +38,17 @@ class QuizScreen extends ConsumerWidget {
               Expanded(
                 child: QuizQuestionCard(
                   question: currentQuestion,
-                  selectedAnswerIndex:
-                      quizState.selectedAnswers[currentQuestion.id],
+                  selectedAnswerIndex: quizState.selectedAnswers[currentQuestion.id],
                   onAnswerSelected: (index) {
-                    final isCorrect =
-                        index == currentQuestion.correctAnswerIndex;
+                    final isCorrect = index == currentQuestion.correctAnswerIndex;
                     quizStateNotifier.state = quizState.copyWith(
                       selectedAnswers: {
                         ...quizState.selectedAnswers,
                         currentQuestion.id: index,
                       },
-                      score: isCorrect ? quizState.score + 1 : quizState.score,
+                      score: isCorrect
+                          ? quizState.score + 1
+                          : quizState.score,
                     );
                   },
                 ),
@@ -54,44 +56,40 @@ class QuizScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
-                  onPressed:
-                      quizState.currentQuestionIndex < questions.length - 1
-                          ? () {
-                              quizStateNotifier.state = quizState.copyWith(
-                                currentQuestionIndex:
-                                    quizState.currentQuestionIndex + 1,
-                              );
-                            }
-                          : () async {
-                              await quizState.saveScore();
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Quiz Completed'),
-                                  content: Text(
-                                      'Your score: ${quizState.score}/${questions.length}'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        quizStateNotifier.state = QuizState();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Restart'),
-                                    ),
-                                  ],
+                  onPressed: quizState.currentQuestionIndex < questions.length - 1
+                      ? () {
+                          quizStateNotifier.state = quizState.copyWith(
+                            currentQuestionIndex: quizState.currentQuestionIndex + 1,
+                          );
+                        }
+                      : () async {
+                          await databaseService.saveQuizScore(quizState.score);
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Quiz Completed'),
+                              content: Text('Your score: ${quizState.score}/${questions.length}'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    quizStateNotifier.state = QuizState();
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Restart'),
                                 ),
-                              );
-                            },
-                  child: Text(
-                      quizState.currentQuestionIndex < questions.length - 1
-                          ? 'Next Question'
-                          : 'Finish Quiz'),
+                              ],
+                            ),
+                          );
+                        },
+                  child: Text(quizState.currentQuestionIndex < questions.length - 1
+                      ? 'Next Question'
+                      : 'Finish Quiz'),
                 ),
               ),
             ],
           );
         },
-        loading: () => const LoadingIndicator(),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
       ),
     );

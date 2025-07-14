@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../data/data_sources/remote/element_api_service.dart';
 import '../../data/data_sources/remote/quiz_api_service.dart';
 import '../../data/data_sources/local/shared_preferences_service.dart';
 import '../../data/data_sources/local/database_service.dart';
+import '../../data/data_sources/local/notification_service.dart';
 import '../../data/repositories/element_repository_impl.dart';
 import '../../data/repositories/quiz_repository_impl.dart';
 import '../../data/repositories/learning_path_repository_impl.dart';
@@ -20,18 +20,16 @@ import '../../domain/use_cases/get_quiz_questions_use_case.dart';
 import '../../domain/use_cases/get_learning_path_use_case.dart';
 import '../../domain/use_cases/update_user_progress_use_case.dart';
 import '../../domain/use_cases/get_user_statistics_use_case.dart';
-import '../utils/network_info.dart';
 
 final GetIt getIt = GetIt.instance;
 
-void setupDependencies() {
+Future<void> setupDependencies() async {
   // Register services
   getIt.registerSingleton<ElementApiService>(ElementApiService());
   getIt.registerSingleton<QuizApiService>(QuizApiService());
   getIt.registerSingleton<SharedPreferencesService>(SharedPreferencesService());
   getIt.registerSingleton<DatabaseService>(DatabaseService());
-  getIt.registerSingleton<Connectivity>(Connectivity());
-  getIt.registerSingleton<NetworkInfo>(NetworkInfoImpl(getIt<Connectivity>()));
+  getIt.registerSingleton<NotificationService>(NotificationService());
 
   // Register repositories
   getIt.registerSingleton<ElementRepository>(

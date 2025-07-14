@@ -1,3 +1,4 @@
+import '../../domain/entities/statistics_entity.dart';
 import '../../domain/repositories/statistics_repository.dart';
 import '../data_sources/local/database_service.dart';
 
@@ -7,12 +8,14 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   StatisticsRepositoryImpl(this.databaseService);
 
   @override
-  Future<List<Map<String, dynamic>>> getQuizScores() async {
-    return await databaseService.getQuizScores();
-  }
-
-  @override
-  Future<int> getCompletedLearningPathsCount() async {
-    return await databaseService.getCompletedLearningPathsCount();
+  Future<StatisticsEntity> getUserStatistics() async {
+    final quizScores = await databaseService.getQuizScores();
+    final completedPaths = await databaseService.getLearningPaths();
+    final completedCount = completedPaths.where((path) => path.isCompleted).length;
+    return StatisticsEntity(
+      quizScores: quizScores,
+      learningPathCompletion: completedCount,
+      totalLearningPaths: completedPaths.length,
+    );
   }
 }

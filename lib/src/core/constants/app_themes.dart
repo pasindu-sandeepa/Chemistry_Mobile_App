@@ -4,10 +4,6 @@ import 'app_colors.dart';
 class AppThemes {
   static final lightTheme = ThemeData(
     primaryColor: AppColors.primaryColor,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.primaryColor,
-      secondary: AppColors.secondaryColor,
-    ),
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primaryColor,
@@ -15,28 +11,34 @@ class AppThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
         foregroundColor: Colors.white,
+        backgroundColor: AppColors.primaryColor,
       ),
+    ),
+    cardTheme: CardTheme(
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   );
 
   static final darkTheme = ThemeData(
     primaryColor: AppColors.primaryColor,
-    colorScheme: const ColorScheme.dark(
-      primary: AppColors.primaryColor,
-      secondary: AppColors.secondaryColor,
-    ),
     scaffoldBackgroundColor: Colors.grey[900],
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       backgroundColor: AppColors.primaryColor,
       foregroundColor: Colors.white,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
         foregroundColor: Colors.white,
+        backgroundColor: AppColors.primaryColor,
       ),
+    ),
+    cardTheme: CardTheme(
+      color: Colors.grey[800],
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   );
 }
