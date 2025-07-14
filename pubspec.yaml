@@ -32,3 +32,4 @@ flutter:
     - assets/elements.json
     - assets/quiz_questions.json
     - assets/learning_paths.json
+    - assets/images/logo.jpg
