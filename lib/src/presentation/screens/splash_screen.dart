@@ -4,13 +4,14 @@ import '../../core/constants/app_colors.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -21,18 +22,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(seconds: 3),
     );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_animationController);
     _animationController.forward();
 
-    // Navigate to HomeScreen after 3 seconds
-    Timer(
-      const Duration(seconds: 3),
-      () {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      },
-    );
+    Timer(const Duration(seconds: 200), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    });
   }
 
   @override
@@ -55,14 +55,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             colors: [
               AppColors.primaryColor.withOpacity(0.2),
               AppColors.backgroundColor,
-              AppColors.backgroundColor.withOpacity(0.9),
-              AppColors.secondaryColor.withOpacity(0.1),
+              const Color.fromARGB(255, 226, 228, 229).withOpacity(0.9),
+              const Color.fromARGB(255, 7, 44, 255).withOpacity(0.1),
             ],
           ),
         ),
         child: Stack(
           children: [
-            // Background design elements
             Positioned(
               top: screenHeight * 0.1,
               right: -screenWidth * 0.1,
@@ -87,12 +86,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 ),
               ),
             ),
-            // Main content
             SafeArea(
               child: Column(
                 children: [
                   const Spacer(flex: 1),
-                  // Logo and app name
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +108,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         const SizedBox(height: 24),
                         ShaderMask(
                           shaderCallback: (bounds) => LinearGradient(
-                            colors: [AppColors.secondaryColor, AppColors.primaryColor],
+                            colors: [
+                              const Color.fromARGB(255, 14, 6, 110),
+                              const Color.fromARGB(255, 16, 117, 200),
+                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ).createShader(bounds),
@@ -138,7 +138,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
                   ),
                   const Spacer(flex: 1),
-                  // Progress bar
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 50),
                     child: Column(
@@ -154,7 +153,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                                 child: LinearProgressIndicator(
                                   value: _animation.value,
                                   backgroundColor: AppColors.backgroundColor,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.primaryColor,
+                                  ),
                                 ),
                               ),
                             );

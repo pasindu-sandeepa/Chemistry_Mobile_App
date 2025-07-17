@@ -1,6 +1,6 @@
 {
-    "name": "chemistry",
-    "short_name": "chemistry",
+    "name": "periodic_table_app",
+    "short_name": "periodic_table_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
