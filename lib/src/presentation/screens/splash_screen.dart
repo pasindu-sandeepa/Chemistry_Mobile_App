@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 7),
     );
     _animation = Tween<double>(
       begin: 0.0,
@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
     ).animate(_animationController);
     _animationController.forward();
 
-    Timer(const Duration(seconds: 200), () {
+    Timer(const Duration(seconds: 7), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
